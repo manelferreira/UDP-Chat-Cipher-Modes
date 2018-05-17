@@ -120,23 +120,11 @@ class SDES:
         
         return final[:4], second_half
 
-    def setKey(self, key):
-        self.key = key
-
 class ECB:
     def encrypt(self, plainText):
-        firstFive = ""
-        lastFive = ""
-        for _ in range(5):
-            firstFive += str(random.randint(0, 1))
-            lastFive += str(random.randint(0, 1))
-
-        # print("\nGENERATED SDES KEY: " + firstFive + lastFive)
-
-        # cipherMode 2 bits and first 5 bits of sdes key
-        encrypted = "00" + firstFive
+        # cipherMode 2 bits
+        encrypted = "00"
         sdes = SDES()
-        sdes.setKey(firstFive + lastFive)
 
         # print("\n=============== ECB ENCRYPTING ================")
         # print("Plain text passing through ECB: " + plainText)
@@ -148,20 +136,12 @@ class ECB:
             encryptedBlock = sdes.encrypt(block)
             encrypted += encryptedBlock
 
-        # last 5 bits of sdes key
-        encrypted += lastFive
-
         return encrypted
 
     def decrypt(self, encrypted):
         plainTextBits = ""
-        
-        sdesKey = encrypted[0:5] + encrypted[len(encrypted)-5:]
-        # print("\nRECEIVED SDES KEY: " + sdesKey)
-        encrypted = encrypted[5:(len(encrypted)-5)]
 
         sdes = SDES()
-        sdes.setKey(sdesKey)
 
         times = len(encrypted)/8
 
@@ -174,22 +154,13 @@ class ECB:
 
 class CTR:
     def encrypt(self, plainText):
-        firstFive = ""
-        lastFive = ""
-        for _ in range(5):
-            firstFive += str(random.randint(0, 1))
-            lastFive += str(random.randint(0, 1))
-
-        # print("\nGENERATED SDES KEY: " + firstFive + lastFive)
-
-        # cipherMode 2 bits and first 5 bits of sdes key
-        encrypted = "01" + firstFive
+        # cipherMode 2 bits
+        encrypted = "01"
 
         # print("\n=============== CTR ENCRYPTING ================")
         # print("Plain text passing through CTR: " + plainText)
 
         sdes = SDES()
-        sdes.setKey(firstFive + lastFive)
 
         counter = "0"
 
@@ -207,20 +178,12 @@ class CTR:
 
             encrypted += encryptedBlock
 
-        # last 5 bits of sdes key
-        encrypted += lastFive
-
         return encrypted
 
     def decrypt(self, encrypted):
         plainTextBits = ""
         
-        sdesKey = encrypted[0:5] + encrypted[len(encrypted)-5:]
-        # print("\nRECEIVED SDES KEY: " + sdesKey)
-        encrypted = encrypted[5:(len(encrypted)-5)]
-
         sdes = SDES()
-        sdes.setKey(sdesKey)
 
         counter = "0"
 
@@ -242,18 +205,10 @@ class CTR:
 
 class CBC:
     def encrypt(self, plainText):
-        firstFive = ""
-        lastFive = ""
-        for _ in range(5):
-            firstFive += str(random.randint(0, 1))
-            lastFive += str(random.randint(0, 1))
+        # cipherMode 2 bits
+        encrypted = "10"
 
-        # print("\nGENERATED SDES KEY: " + firstFive + lastFive)
-
-        # cipherMode 2 bits and first 5 bits of sdes key
-        encrypted = "10" + firstFive
         sdes = SDES()
-        sdes.setKey(firstFive + lastFive)
 
         initialVector = ""
         for _ in range(8):
@@ -284,20 +239,13 @@ class CBC:
 
         # initial vector bits
         encrypted += initialVector
-        # last 5 bits of sdes key
-        encrypted += lastFive
 
         return encrypted
 
     def decrypt(self, encrypted):
         plainTextBits = ""
 
-        sdesKey = encrypted[0:5] + encrypted[len(encrypted)-5:]
-        # print("\nRECEIVED SDES KEY: " + sdesKey)
-        encrypted = encrypted[5:(len(encrypted)-5)]
-
         sdes = SDES()
-        sdes.setKey(sdesKey)
 
         initialVector = encrypted[(len(encrypted)-8):]
         # print("\nRECEIVED IV: " + initialVector)
